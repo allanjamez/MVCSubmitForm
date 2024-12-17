@@ -1,0 +1,34 @@
+﻿@{
+    ViewData["Title"] = "Submit Form";
+}
+@model BidOneWebApp.Models.SubmitModel
+<h2 style="text-align: center; margin-bottom: 20px;">Submit Your Details</h2>
+
+@if (ViewBag.Message != null)
+{
+    <p style="color: green; text-align: center;">@ViewBag.Message</p>
+}
+
+<div style="display: flex; justify-content: center; align-items: center; height: 60vh;">
+    <form method="post" style="width: 300px;">
+        <div style="margin-bottom: 15px;">
+            <label style="display: inline-block; width: 100px;">First Name</label>
+            <input asp-for="FirstName" style="width: 180px; padding: 5px;" />
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label style="display: inline-block; width: 100px;">Last Name</label>
+            <input asp-for="LastName" style="width: 180px; padding: 5px;" />
+        </div>
+        <div style="text-align: center; margin-top: 15px;">
+            <button type="submit" style="
+                background-color: #007bff;
+                color: white;
+                border: none;
+                padding: 8px 15px;
+                cursor: pointer;
+                border-radius: 4px;">
+                Submit
+            </button>
+        </div>
+    </form>
+</div>

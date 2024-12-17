@@ -1,0 +1,15 @@
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.log
+*.vsidx
+
+*.dll
+*.exe
+*.pdb
+
+*.tmp
+*.lock
