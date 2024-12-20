@@ -23,23 +23,59 @@ namespace BidOneWebApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult Index(SubmitModel SubmitDetails)
+          public IActionResult Index(SubmitModel SubmitDetails)
+    {
+        if (ModelState.IsValid)
         {
-            if (ModelState.IsValid)
-            {            
-                if (!Directory.Exists("Data"))
-                {
-                    Directory.CreateDirectory("Data");
-                }
-
-                var jsonData = JsonSerializer.Serialize(SubmitDetails);
-                System.IO.File.AppendAllText(_filePath, jsonData + Environment.NewLine);
-
-                ViewBag.Message = "Form submitted successfully!";
-
-                ModelState.Clear();
+            if (!Directory.Exists("Data"))
+            {
+                Directory.CreateDirectory("Data");
             }
-            return View();
+
+            List<SubmitModel> data = new List<SubmitModel>();
+
+            if (System.IO.File.Exists(_filePath))
+            {
+                string fileContent = System.IO.File.ReadAllText(_filePath);
+
+                try
+                {
+
+                    data = JsonSerializer.Deserialize<List<SubmitModel>>(fileContent) ?? new List<SubmitModel>();
+                }
+                catch (JsonException)
+                {
+
+                    string[] lines = System.IO.File.ReadAllLines(_filePath);
+                    foreach (string line in lines)
+                    {
+                        if (!string.IsNullOrWhiteSpace(line))
+                        {
+                            try
+                            {
+                                SubmitModel? model = JsonSerializer.Deserialize<SubmitModel>(line.Trim());
+                                if (model != null)
+                                {
+                                    data.Add(model);
+                                }
+                            }
+                            catch (JsonException)
+                            {
+                            }
+                        }
+                    }
+                }
+            }
+
+            data.Add(SubmitDetails);
+
+
+            string jsonData = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
+            System.IO.File.WriteAllText(_filePath, jsonData);
+
+     
+            ViewBag.Message = "Form submitted successfully!";
+            ModelState.Clear();
         }
 
 
