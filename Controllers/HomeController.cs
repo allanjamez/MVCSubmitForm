@@ -22,60 +22,64 @@ namespace BidOneWebApp.Controllers
             return View();
         }
 
+  
         [HttpPost]
-          public IActionResult Index(SubmitModel SubmitDetails)
-    {
-        if (ModelState.IsValid)
+        public IActionResult Index(SubmitModel SubmitDetails)
         {
-            if (!Directory.Exists("Data"))
+            if (ModelState.IsValid)
             {
-                Directory.CreateDirectory("Data");
-            }
-
-            List<SubmitModel> data = new List<SubmitModel>();
-
-            if (System.IO.File.Exists(_filePath))
-            {
-                string fileContent = System.IO.File.ReadAllText(_filePath);
-
-                try
+                // Ensure the "Data" folder exists
+                if (!Directory.Exists("Data"))
                 {
-
-                    data = JsonSerializer.Deserialize<List<SubmitModel>>(fileContent) ?? new List<SubmitModel>();
+                    Directory.CreateDirectory("Data");
                 }
-                catch (JsonException)
-                {
 
-                    string[] lines = System.IO.File.ReadAllLines(_filePath);
-                    foreach (string line in lines)
+                List<SubmitModel> data = new List<SubmitModel>();
+
+       
+                if (System.IO.File.Exists(_filePath))
+                {
+                    string fileContent = System.IO.File.ReadAllText(_filePath);
+
+                    try
                     {
-                        if (!string.IsNullOrWhiteSpace(line))
+                  
+                        data = JsonSerializer.Deserialize<List<SubmitModel>>(fileContent) ?? new List<SubmitModel>();
+                    }
+                    catch (JsonException)
+                    {
+               
+                        string[] lines = System.IO.File.ReadAllLines(_filePath);
+                        foreach (string line in lines)
                         {
-                            try
+                            if (!string.IsNullOrWhiteSpace(line))
                             {
-                                SubmitModel? model = JsonSerializer.Deserialize<SubmitModel>(line.Trim());
-                                if (model != null)
+                                try
                                 {
-                                    data.Add(model);
+                                    SubmitModel? model = JsonSerializer.Deserialize<SubmitModel>(line.Trim());
+                                    if (model != null)
+                                    {
+                                        data.Add(model);
+                                    }
                                 }
-                            }
-                            catch (JsonException)
-                            {
+                                catch (JsonException)
+                                {
+                                }
                             }
                         }
                     }
                 }
+
+                data.Add(SubmitDetails);
+
+                string jsonData = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
+                System.IO.File.WriteAllText(_filePath, jsonData);
+
+                ViewBag.Message = "Form submitted successfully!";
+                ModelState.Clear();
             }
 
-            data.Add(SubmitDetails);
-
-
-            string jsonData = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
-            System.IO.File.WriteAllText(_filePath, jsonData);
-
-     
-            ViewBag.Message = "Form submitted successfully!";
-            ModelState.Clear();
+            return View();
         }
 
 
